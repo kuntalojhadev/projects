@@ -4,117 +4,145 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 import streamlit as st 
 from keras.models import load_model
-from sklearn.preprocessing import MinMaxScaler
+
 
 start = '2013-01-01'
 end = '2024-04-30'
 
 st.title('Stock High & Low Price Prediction')
 
-user_input = st.text_input('Enter Stock Ticker', 'SBIN.NS')
+user_input = st.text_input('Enter Stock Ticker','SBIN.NS')
 df = yf.download(user_input, start=start, end=end)
 df.head()
 
-# Describing Data
+#Describing Data
 st.subheader('Data from 2013-2024')
 st.write(df.describe())
 
-# High Price Prediction
 st.subheader("Stock High Price Prediction")
 
-# High Price vs Time Chart
+#Visualizations
 st.subheader('High Price vs Time Chart')
 fig = plt.figure(figsize=(12,6))
-plt.plot(df['High'])
+plt.xlabel('Time')
+plt.ylabel('Price')
+plt.plot(df.High,'g',label = 'High Price')
 st.pyplot(fig)
 
-# Splitting Data into training and testing
-data_training_high = df['High'][0:int(len(df)*0.75)]
-data_testing_high = df['High'][int(len(df)*0.75):]
 
-scaler_high = MinMaxScaler(feature_range=(0, 1))
-data_training_high_array = scaler_high.fit_transform(np.array(data_training_high).reshape(-1,1))
+## Spliting Data into training and testing
 
-# Load high price model
-model_high = load_model('high50.h5')
+data_tarining = pd.DataFrame(df['High'][0:int(len(df)*0.75)])
+data_testing = pd.DataFrame(df['High'][int(len(df)*0.75):int(len(df))])
 
-# Testing part for high price
-past_100_days_high = data_training_high.tail(100)
-final_df_high = pd.concat([past_100_days_high, data_testing_high], ignore_index=True)
-input_data_high = scaler_high.transform(np.array(final_df_high).reshape(-1,1))
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler(feature_range =(0,1))
 
-# Create test dataset
-x_test_high = []
-y_test_high = []
+data_tarining_array = scaler.fit_transform(data_tarining)
 
-for i in range(100, len(input_data_high)):
-    x_test_high.append(input_data_high[i-100:i])
-    y_test_high.append(input_data_high[i, 0])
+# Load my model
+# Use high50.h5 for more currect
+model = load_model('high50.h5')
 
-x_test_high, y_test_high = np.array(x_test_high), np.array(y_test_high)
+# Testing part
+# Extract the last 100 days of data
+past_100_days = data_tarining.tail(100)
+# Concatenate past_100_days and data_training
+final_df = pd.concat([past_100_days, data_testing], ignore_index=True)
+input_data = scaler.fit_transform(final_df)
 
-# Making Predictions for high price
-y_predicted_high = model_high.predict(x_test_high)
-scale_factor_high = 1 / scaler_high.scale_[0]
-y_predicted_high = y_predicted_high * scale_factor_high
-y_test_high = y_test_high * scale_factor_high
+# test part
+x_test = []
+y_test = []
 
-# Final Graph for high price prediction
+for i in range(100, input_data.shape[0]):
+  x_test.append(input_data[i-100:i])
+  y_test.append(input_data[i,0])
+
+
+x_test,y_test = np.array(x_test),np.array(y_test)
+# Making Predictions
+y_predicted = model.predict(x_test)
+scaler = scaler.scale_
+
+scale_factor = 1/scaler[0]
+y_predicted = y_predicted * scale_factor
+y_test = y_test * scale_factor
+
+# Final Graph
 st.subheader('High Price Predictions vs Original High Price')
 fig2 = plt.figure(figsize=(12,6))
-plt.plot(y_test_high, 'b', label='Original High Price')
-plt.plot(y_predicted_high, 'r', label='Predicted High Price')
+plt.plot(y_test,'b',label = 'Original High Price')
+plt.plot(y_predicted,'g',label='Predicted High Price' )
 plt.xlabel('Time')
 plt.ylabel('Price')
 plt.legend()
+# plt.show()
 st.pyplot(fig2)
 
-# Low Price Prediction
+##################################################################################################################
+##################################################################################################################
 st.subheader("Stock Low Price Prediction")
 
-# Low Price vs Time Chart
+#Visualizations
 st.subheader('Low Price vs Time Chart')
-fig = plt.figure(figsize=(12,6))
-plt.plot(df['Low'])
-st.pyplot(fig)
+fig3 = plt.figure(figsize=(12,6))
+plt.xlabel('Time')
+plt.ylabel('Price')
+plt.plot(df.Low,'r',label = 'Low Price')
+st.pyplot(fig3)
 
-# Splitting Data into training and testing
-data_training_low = df['Low'][0:int(len(df)*0.75)]
-data_testing_low = df['Low'][int(len(df)*0.75):]
 
-scaler_low = MinMaxScaler(feature_range=(0, 1))
-data_training_low_array = scaler_low.fit_transform(np.array(data_training_low).reshape(-1,1))
+## Spliting Data into training and testing
 
-# Load low price model
-model_low = load_model('low50.h5')
+data_tarining = pd.DataFrame(df['Low'][0:int(len(df)*0.75)])
+data_testing = pd.DataFrame(df['Low'][int(len(df)*0.75):int(len(df))])
 
-# Testing part for low price
-past_100_days_low = data_training_low.tail(100)
-final_df_low = pd.concat([past_100_days_low, data_testing_low], ignore_index=True)
-input_data_low = scaler_low.transform(np.array(final_df_low).reshape(-1,1))
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler(feature_range =(0,1))
 
-# Create test dataset
-x_test_low = []
-y_test_low = []
+data_tarining_array = scaler.fit_transform(data_tarining)
 
-for i in range(100, len(input_data_low)):
-    x_test_low.append(input_data_low[i-100:i])
-    y_test_low.append(input_data_low[i, 0])
+# Load my model
+# Use high50.h5 for more currect
+model = load_model('low50.h5')
 
-x_test_low, y_test_low = np.array(x_test_low), np.array(y_test_low)
+# Testing part
+# Extract the last 100 days of data
+past_100_days = data_tarining.tail(100)
+# Concatenate past_100_days and data_training
+final_df = pd.concat([past_100_days, data_testing], ignore_index=True)
+input_data = scaler.fit_transform(final_df)
 
-# Making Predictions for low price
-y_predicted_low = model_low.predict(x_test_low)
-scale_factor_low = 1 / scaler_low.scale_[0]
-y_predicted_low = y_predicted_low * scale_factor_low
-y_test_low = y_test_low * scale_factor_low
+# test part
+x_test = []
+y_test = []
 
-# Final Graph for low price prediction
+for i in range(100, input_data.shape[0]):
+  x_test.append(input_data[i-100:i])
+  y_test.append(input_data[i,0])
+
+
+x_test,y_test = np.array(x_test),np.array(y_test)
+# Making Predictions
+y_predicted = model.predict(x_test)
+scaler = scaler.scale_
+
+scale_factor = 1/scaler[0]
+y_predicted = y_predicted * scale_factor
+y_test = y_test * scale_factor
+
+# Final Graph
 st.subheader('Low Price Predictions vs Original Low Price')
-fig2 = plt.figure(figsize=(12,6))
-plt.plot(y_test_low, 'b', label='Original Low Price')
-plt.plot(y_predicted_low, 'r', label='Predicted Low Price')
+fig4 = plt.figure(figsize=(12,6))
+plt.plot(y_test,'b',label = 'Original Low Price')
+plt.plot(y_predicted,'r',label='Predicted Low Price' )
 plt.xlabel('Time')
 plt.ylabel('Price')
 plt.legend()
-st.pyplot(fig2)
+# plt.show()
+st.pyplot(fig4)
+# Use for run this app
+# http://localhost:8501/
+# http://192.168.0.121:8501/
+# streamlit run app.py
