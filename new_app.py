@@ -10,10 +10,15 @@ from keras.models import Sequential
 import streamlit as st
 
 # Set the title of the Streamlit app
-st.title('Stock High & Low Price Prediction')
+# st.title('Stock High & Low Price Prediction')
+st.title('Study of stock price prediction')
+
+
+tickers = ['PNB.NS', 'SBIN.NS', 'HDFCBANK.NS']
+user_input = st.selectbox('Select Stock Ticker', tickers, index=0)
 
 # Collect user input for stock ticker symbol
-user_input = st.text_input('Enter Stock Ticker', 'SBIN.NS')
+# user_input = st.text_input('Enter Stock Ticker', 'SBIN.NS')
 
 # Download stock data using yfinance
 start = '2013-01-01'
