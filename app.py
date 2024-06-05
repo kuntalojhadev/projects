@@ -10,7 +10,7 @@ from keras.models import Sequential
 import streamlit as st
 
 # Set the title of the Streamlit app
-st.title('Stock High & Low Price Prediction')
+st.title('Study of stock price prediction')
 
 # Collect user input for stock ticker symbol
 user_input = st.text_input('Enter Stock Ticker', 'SBIN.NS')
