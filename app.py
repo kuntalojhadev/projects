@@ -10,10 +10,15 @@ from keras.models import Sequential
 import streamlit as st
 
 # Set the title of the Streamlit app
+# st.title('Stock High & Low Price Prediction')
 st.title('Study of stock price prediction')
 
+
+tickers = ['PNB.NS', 'SBIN.NS', 'HDFCBANK.NS']
+user_input = st.selectbox('Select Stock Ticker', tickers, index=0)
+
 # Collect user input for stock ticker symbol
-user_input = st.text_input('Enter Stock Ticker', 'SBIN.NS')
+# user_input = st.text_input('Enter Stock Ticker', 'SBIN.NS')
 
 # Download stock data using yfinance
 start = '2013-01-01'
@@ -25,7 +30,6 @@ st.subheader('Data from 2013-2024')
 st.write(df.describe())
 
 # Display a chart of the high prices over time
-st.subheader('High Price Prediction')
 st.subheader('High Price vs Time Chart')
 fig = plt.figure(figsize=(12, 6))
 plt.xlabel('Time')
@@ -93,7 +97,7 @@ st.write(f'Prediction Accuracy: {r3}%')
 
 ##################################################################################################################
 ##################################################################################################################
-st.subheader('Low Price Prediction')
+# st.title("Stock Low Price Prediction")
 
 #Visualizations
 st.subheader('Low Price vs Time Chart')
@@ -174,7 +178,7 @@ st.write(f'R-squared (R²): {r2}')
 st.write(f'Prediction Accuracy: {r3}%')
 
 
-# Use to run this app
+# Use for run this app
 # http://localhost:8501/
 # http://192.168.0.121:8501/
 # https://kuntalojha.streamlit.app/
